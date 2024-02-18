@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}PsyGenius AI.{% endblock %}
+{% block content %}
+
+<section id="hero-animated" class="hero-animated d-flex align-items-center" style="width: 100%;height: 100%;top: 0;left: 0;">
+
+    <div class="container d-flex flex-column justify-content-center align-items-center text-center position-relative" data-aos="zoom-out">
+      <img src="{{ url_for('static', filename='assets/img/img_index.jpeg') }}" class="img-fluid animated">
+      <h2>Bienvenido a <span>PsyGenius AI.</span></h2>
+      <p>Sistema de evaluación psicológica con IA Generativa.</br>
+      Te recomendamos ver el siguiente vídeo antes de iniciar con la evaluación:</p>
+      <div class="d-flex">
+        <a href="https://app.heygen.com/embeds/adb356273c4d4d1eb541ba3373a7f5ac" class="glightbox btn-watch-video d-flex align-items-center" style="margin-left: 0;">
+          <i class="bi bi-play-circle"></i><span>Ver Video</span>
+        </a>
+      </div>
+      <p></p>
+      <div class="d-flex">
+        <a id="inieval" type="submit" role="button" class="btn-get-started scrollto">Iniciar evaluación</a>
+      </div>
+    </div>
+  
+</section>
+
+<main id="main">
+
+  <!-- ======= Features Section ======= -->
+  <section id="features" class="features" style="width: 100%;height: 100%;padding: 0;top: 0;left: 0; display: none;">
+    <div class="container" data-aos="fade-up">
+      <center>
+        <ul class="nav nav-tabs row gy-4 d-flex">
+          <li class="nav-item col-6 col-md-4 col-lg-2">
+            <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#tab-1">
+              <i class="bi bi-binoculars color-blue"></i>
+              <h4>Evaluación</h4>
+            </a>
+          </li>
+
+          <li class="nav-item col-6 col-md-4 col-lg-2">
+            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-2">
+              <i class="bi bi-easel color-indigo"></i>
+              <h4>Escritura creativa</h4>
+            </a>
+          </li>
+        </ul>
+      </center>
+
+      <div class="tab-content">
+
+        <div class="tab-pane active show" id="tab-1">
+            <div class="row gy-4">
+              <div class="col-lg-8 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="100">
+              <h3>Evaluación</h3>
+              <video id="video" width="800" height="640" autoplay></video>
+            </div>
+            <div class="col-lg-4 order-1 order-lg-2 text-center" data-aos="fade-up" data-aos-delay="200">
+              <div class="pricing container pricing-item" style="background: white;">
+                <div class="text-center mt-auto">
+                  </br></br></br></br></br></br></br></br></br></br>
+                  <p>
+                    <a id="startRecord" type="submit" role="button" class="buy-btn">Iniciar evaluación</a>
+                    <canvas id="canvas" width="1200" height="800" style="display:none;"></canvas>
+                  </p>
+                  </br></br>
+                  <a id="saveVideo" type="submit" role="button" class="buy-btn" style="display:none;">Guardar</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane" id="tab-2">
+          <div class="row gy-4">
+            
+            <form action="{{ url_for('finalizar')}}" method="POST" style="display: flex;">
+              <div class="col-lg-8 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="100" style="height: 700px;">
+                <h3>Escritura creativa</h3>
+                <div class="col-lg-8 order-2 order-lg-1">
+                    <div class="form-group mt-3">
+                      <textarea class="form-control" id="message" name="message" placeholder="Message" required style="width: 800px;height: 600px;"></textarea>
+                    </div>
+                </div>
+              </div>
+              <div class="col-lg-4 order-1 order-lg-2 text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="pricing container pricing-item" style="background: white;">
+                  <div class="text-center mt-auto">
+                    </br></br></br></br></br></br></br></br></br></br></br></br></br>
+                    <p>
+                      <button id="btnfinalizar" type="submit" role="button" class="buy-btn">Finalizar</button>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section><!-- End Features Section -->
+  
+</main><!-- End #main -->
+
+<a href="{{ url_for('home') }}" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<div id="preloader"></div>
+
+<script>
+  var boton = document.getElementById('inieval');
+  let videoElement = document.getElementById('video');
+  let startRecordButton = document.getElementById('startRecord');
+  let saveButton = document.getElementById('saveVideo');
+  var canvas = document.getElementById('canvas');
+  var context = canvas.getContext('2d');
+  var textarea = document.getElementById("message");
+
+  let stream = null;
+  let mediaRecorder = null;
+  let chunks = [];
+  let mediaStream;
+
+  boton.addEventListener('click', function() {
+    document.getElementById("features").style.display = "block";
+    window.location.href = '#features';
+    
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function (stream) {
+        mediaStream = stream;
+        videoElement.srcObject = stream;
+        videoElement.play();
+    })
+    .catch(function (err) {
+        console.error('Error al obtener el video: ', err);
+    });
+
+    fetch('/evaluacion', {
+      method: 'POST'
+    })
+    .then(response => {
+      
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  });
+
+  startRecordButton.addEventListener('click', function () {
+    chunks = [];
+    mediaRecorder = new MediaRecorder(videoElement.srcObject);
+    mediaRecorder.ondataavailable = function (e) {
+        chunks.push(e.data);
+    }
+    mediaRecorder.start();
+
+    let formData = new FormData();
+
+    fetch('/start_evaluacion', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+        saveButton.removeAttribute("style");
+        
+        if (!response.ok) {
+            throw new Error('Error al iniciar la evaluación.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+    });
+
+  saveButton.addEventListener('click', function() {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    var dataURL = canvas.toDataURL('image/png');
+
+    mediaRecorder.stop();
+
+    var byteString = atob(dataURL.split(",")[1]);
+    var mimeString = dataURL.split(",")[0].split(":")[1].split(";")[0];
+    var arrayBuffer = new ArrayBuffer(byteString.length);
+    var uint8Array = new Uint8Array(arrayBuffer);
+    
+    for (var i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
+
+    var fotoBlob = new Blob([arrayBuffer], { type: mimeString });
+
+    let formData = new FormData();
+    formData.append('foto', fotoBlob);
+    
+    fetch('/save_evaluacion', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error al guardar evaluación.');
+        }
+
+        mediaStream.getTracks().forEach(function(track) {
+          track.stop();
+        });
+
+        videoElement.srcObject = null;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  });
+</script>
+
+{% endblock %}
